@@ -1,0 +1,122 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 300px;
+  font: 13px/1.5 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  color: #222;
+  background: #fff;
+  padding: 12px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+h1 {
+  font-size: 15px;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+}
+
+h2 {
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+  margin: 8px 0 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row input[type="color"] {
+  width: 26px;
+  height: 22px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.cname {
+  flex: 1;
+}
+
+.chint {
+  color: #999;
+  font-size: 11px;
+  width: 44px;
+  text-align: right;
+}
+
+button.primary {
+  width: 100%;
+  margin: 8px 0 2px;
+  padding: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #4dabf7;
+  border-color: #4dabf7;
+  color: #fff;
+}
+
+button.primary:hover {
+  background: #339af0;
+  border-color: #339af0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+button {
+  flex: 1;
+  border: 1px solid #d9d9d9;
+  background: #fafafa;
+  color: #333;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f0f0f0;
+}
+
+footer {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 11px;
+  color: #999;
+}
+
+footer b {
+  color: #666;
+}

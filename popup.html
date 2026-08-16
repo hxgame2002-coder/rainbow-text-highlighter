@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>彩虹高亮助手</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <h1>🌈 彩虹高亮助手</h1>
+    <label class="switch-row">
+      <input type="checkbox" id="enabled" checked />
+      <span>启用</span>
+    </label>
+  </header>
+
+  <button id="open-panel" class="primary" type="button">🔍 在页面上打开关键词框</button>
+
+  <section>
+    <h2>高亮颜色（红 → 紫，彩虹顺序）</h2>
+    <div id="color-list"></div>
+    <div class="actions">
+      <button id="reset" type="button">恢复默认</button>
+      <button id="clear-page" type="button">清除本页全部</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>用法：点工具条上的<b>颜色按钮</b>（红/橙/…/紫）切换颜色，</p>
+    <p>在<b>文本框</b>输入该颜色的高亮词（空格分隔）；每个颜色可分别填不同的词，刷新后自动恢复。</p>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

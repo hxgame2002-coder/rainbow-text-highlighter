@@ -1,0 +1,120 @@
+/* 高亮标记样式（前缀 rh- 避免与网页样式冲突） */
+/* 气泡效果：在原文文字后面垫一块圆角背景 */
+mark.rh-hl {
+  padding: 1px 3px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: filter 0.1s ease;
+}
+
+mark.rh-hl:hover {
+  filter: brightness(0.95);
+}
+
+/* 选中文字后弹出的工具条 */
+#rh-toolbar {
+  position: fixed;
+  z-index: 2147483647;
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  font: 12px/1.2 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#rh-toolbar .rh-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: transform 0.08s ease, border-color 0.08s ease;
+}
+
+#rh-toolbar .rh-dot:hover {
+  transform: scale(1.18);
+  border-color: #333333;
+}
+
+/* 当前选中的颜色：加一圈深色描边 */
+#rh-toolbar .rh-dot.rh-active {
+  border-color: #222222;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(0, 0, 0, 0.45);
+}
+
+#rh-toolbar .rh-sep {
+  width: 1px;
+  height: 20px;
+  background: #e5e5e5;
+  margin: 0 2px;
+}
+
+/* 当前颜色标签（显示现在文本框属于哪个颜色） */
+#rh-toolbar .rh-cname {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 13px;
+  color: #222222;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+/* 长方形关键词输入框 */
+#rh-toolbar .rh-input {
+  width: 240px;
+  height: 28px;
+  border: 1px solid #c9c9c9;
+  border-radius: 6px;
+  padding: 0 10px;
+  font: 13px/1 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  color: #222222;
+  background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#rh-toolbar .rh-input:focus {
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.25);
+}
+
+#rh-toolbar .rh-input::placeholder {
+  color: #b0b0b0;
+}
+
+#rh-toolbar .rh-btn {
+  border: none;
+  background: #f3f3f3;
+  color: #333333;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+#rh-toolbar .rh-btn:hover {
+  background: #e2e2e2;
+}
+
+#rh-toolbar .rh-btn:active {
+  background: #d4d4d4;
+}
