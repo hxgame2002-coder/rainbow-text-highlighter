@@ -35,7 +35,8 @@
   let colorLabel = null;
 
   // ---------- 持久化（刷新后自动恢复） ----------
-  const STORE_KEY = "rh_pages"; // { [url]: { colorWords, selections, t } }
+  const STORE_KEY = "rh_pages"; // 旧版 v1.4.1：{ [url]: { colorWords, selections, t } } 整包读写
+  const KEY_PREFIX = "rh:"; // v1.4.2：每页一个独立键 "rh:<url>"，避免多标签页同时保存时互相覆盖
   const MAX_PAGES = 50; // 最多保存 50 个页面，超出自动清理最旧的
   let observer = null;
   let observerTimer = null;
@@ -323,21 +324,28 @@
     const url = currentUrlKey();
     if (!url) return;
     const selections = collectSelections();
-    storageLocalGet(STORE_KEY, (data) => {
-      const pages = data[STORE_KEY] || {};
-      if (!selections.length && !hasWords()) {
-        delete pages[url];
-      } else {
-        pages[url] = { colorWords, selections, t: Date.now() };
+    const key = KEY_PREFIX + url;
+    const entry = { colorWords, selections, t: Date.now() };
+    if (!selections.length && !hasWords()) {
+      // 本页没有高亮了：只删除本页的键（不影响其他标签页的数据）
+      storageLocalSet({ [key]: undefined });
+      return;
+    }
+    // 只写本页自己的键；顺手清理超出上限的最旧页面
+    storageLocalGet(null, (data) => {
+      const raw = data || {};
+      const pages = [];
+      for (const k of Object.keys(raw)) {
+        if (!k.startsWith(KEY_PREFIX)) continue;
+        const p = raw[k];
+        pages.push({ k, t: (p && p.t) || 0 });
       }
-      // 清理超出上限的最旧页面
-      const entries = Object.entries(pages);
-      if (entries.length > MAX_PAGES) {
-        entries.sort((a, b) => (b[1].t || 0) - (a[1].t || 0));
-        const keep = new Set(entries.slice(0, MAX_PAGES).map((e) => e[0]));
-        for (const key of Object.keys(pages)) if (!keep.has(key)) delete pages[key];
-      }
-      storageLocalSet({ [STORE_KEY]: pages });
+      pages.push({ k: key, t: entry.t });
+      pages.sort((a, b) => b.t - a.t);
+      const keep = new Set(pages.slice(0, MAX_PAGES).map((e) => e.k));
+      const changes = { [key]: entry };
+      for (const e of pages) if (!keep.has(e.k)) changes[e.k] = undefined;
+      storageLocalSet(changes);
       if (selections.length || hasWords()) startObserver();
     });
   }
@@ -365,17 +373,56 @@
     }
   }
 
+  // 读取本页保存的数据：优先新格式 "rh:<url>"；兼容旧版 rh_pages，命中旧数据时自动迁移到新键
+  function readPage(url, cb) {
+    storageLocalGet(KEY_PREFIX + url, (data) => {
+      const entry = (data || {})[KEY_PREFIX + url];
+      if (entry) {
+        cb(entry);
+        return;
+      }
+      storageLocalGet(STORE_KEY, (d2) => {
+        const legacyMap = (d2 || {})[STORE_KEY] || {};
+        const legacy = legacyMap[url];
+        if (!legacy) {
+          cb(undefined);
+          return;
+        }
+        cb(migratePage(legacy));
+        // 迁移：写入新键，并把本页从旧键里移除
+        const changes = { [KEY_PREFIX + url]: legacy };
+        const rest = { ...legacyMap };
+        delete rest[url];
+        if (Object.keys(rest).length) changes[STORE_KEY] = rest;
+        else changes[STORE_KEY] = undefined;
+        storageLocalSet(changes);
+      });
+    });
+  }
+
   function restoreState() {
     const url = currentUrlKey();
     if (!url || !enabled) return;
-    storageLocalGet(STORE_KEY, (data) => {
-      const page = (data[STORE_KEY] || {})[url];
-      if (!page) return;
-      applyStored(page);
-      startObserver();
-      // 动态加载的页面：延迟再补一次，覆盖后加载出来的内容
-      setTimeout(() => applyStored(page), 900);
-    });
+    // 多次重试：覆盖会话恢复/动态加载/后台标签页节流导致的一次性漏恢复（每次重读最新数据，幂等）
+    const apply = () => {
+      readPage(url, (page) => {
+        if (!page) return;
+        applyStored(page);
+        startObserver();
+      });
+    };
+    apply();
+    [900, 3000, 8000].forEach((ms) => setTimeout(apply, ms));
+    // 首次交互兜底重放（幂等）：无论什么原因没恢复成功，用户一碰页面就自动补上
+    const onInteract = () => {
+      window.removeEventListener("pointerdown", onInteract, true);
+      window.removeEventListener("keydown", onInteract, true);
+      window.removeEventListener("touchstart", onInteract, true);
+      apply();
+    };
+    window.addEventListener("pointerdown", onInteract, true);
+    window.addEventListener("keydown", onInteract, true);
+    window.addEventListener("touchstart", onInteract, true);
   }
 
   // 监控页面新增内容：有新文字出现时，自动重新应用保存的高亮
@@ -401,8 +448,9 @@
       clearTimeout(observerTimer);
       observerTimer = setTimeout(() => {
         const url = currentUrlKey();
-        storageLocalGet(STORE_KEY, (data) => {
-          applyStored((data[STORE_KEY] || {})[url]);
+        if (!url) return;
+        readPage(url, (page) => {
+          if (page) applyStored(page);
         });
       }, 1000);
     });

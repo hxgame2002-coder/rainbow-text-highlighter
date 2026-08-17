@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "彩虹高亮助手 - Rainbow Highlighter",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "8 个颜色按钮各配一个文本框：点颜色按钮切换颜色，在文本框输入该颜色的高亮词（空格分隔），每个颜色可分别填词，刷新页面后自动恢复。",
   "permissions": ["storage", "contextMenus", "activeTab", "scripting", "notifications"],
   "background": {
